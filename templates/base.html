@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{PAGE_TITLE}}</title>
+<meta name="description" content="{{META_DESCRIPTION}}">
+<link rel="canonical" href="{{CANONICAL_URL}}">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="{{OG_TYPE}}">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="{{SITE_NAME}}">
+<meta property="og:title" content="{{OG_TITLE}}">
+<meta property="og:description" content="{{OG_DESCRIPTION}}">
+<meta property="og:url" content="{{CANONICAL_URL}}">
+{{OG_IMAGE}}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{OG_TITLE}}">
+<meta name="twitter:description" content="{{OG_DESCRIPTION}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ROOT_PATH}}css/style.css">
+<link rel="icon" href="{{ROOT_PATH}}favicon.svg" type="image/svg+xml">
+{{EXTRA_HEAD}}
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="logo" href="{{ROOT_PATH}}" aria-label="{{SITE_NAME}} — página inicial">{{SITE_NAME}}</a>
+    <nav aria-label="Navegação principal">
+      <a href="{{ROOT_PATH}}">Início</a>
+      <a href="{{ROOT_PATH}}desenhos/">Desenhos para Colorir</a>
+      <a href="{{ROOT_PATH}}colorir-online/">Colorir Online</a>
+      <a href="{{ROOT_PATH}}dinossauros/">Dinossauros</a>
+      <a href="{{ROOT_PATH}}curiosidades/">Curiosidades</a>
+      <a href="{{ROOT_PATH}}atividades/">Atividades</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+{{CONTENT}}
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <nav aria-label="Links do rodapé">
+      <a href="{{ROOT_PATH}}politica-de-privacidade/">Política de Privacidade</a>
+      <a href="{{ROOT_PATH}}termos-de-uso/">Termos de Uso</a>
+      <a href="{{ROOT_PATH}}sobre-nos/">Sobre Nós</a>
+      <a href="{{ROOT_PATH}}contato/">Contato</a>
+    </nav>
+    <p>© {{YEAR}} {{SITE_NAME}}. Todos os direitos reservados.</p>
+    <p>{{SITE_TAGLINE}} — grátis para imprimir.</p>
+  </div>
+</footer>
+</body>
+</html>

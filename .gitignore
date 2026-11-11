@@ -1,0 +1,19 @@
+# Build output
+dist/
+releases/
+deploy-staging/
+deploy-manifest.json
+
+# Large binary artwork (published with the site, kept out of the code repo)
+assets/**/*.webp
+assets/**/*.pdf
+assets/**/*.svg
+assets/**/raw/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+*.bak.*

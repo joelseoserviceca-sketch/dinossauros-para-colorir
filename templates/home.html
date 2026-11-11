@@ -1,0 +1,141 @@
+<section class="hero">
+  <span class="float-dino d1" aria-hidden="true">🦕</span><span class="float-dino d2" aria-hidden="true">🦖</span>
+  <span class="float-dino d3" aria-hidden="true">🌋</span><span class="float-dino d4" aria-hidden="true">🌿</span>
+  <div class="wrap">
+    <p class="hero-badge">🎨 100% grátis • sem cadastro</p>
+    <h1>{{H1}}</h1>
+    <p class="lede">{{LEDE}}</p>
+    <form class="busca" id="formBusca" role="search" action="javascript:void(0)">
+      <input type="search" id="campoBusca" placeholder="Buscar desenhos: t-rex, triceratops..." aria-label="Buscar desenhos para colorir" autocomplete="off">
+      <button type="submit">🔍 Buscar</button>
+    </form>
+    <div class="busca-resultados" id="resultadosBusca" aria-live="polite"></div>
+    <div class="hero-stats">
+      <div><strong>{{TOTAL_DESENHOS}}</strong><span>desenhos</span></div>
+      <div><strong>{{TOTAL_DINOS}}</strong><span>dinossauros</span></div>
+      <div><strong>PDF</strong><span>para imprimir</span></div>
+      <div><strong>🎨</strong><span>colorir online</span></div>
+    </div>
+    <div class="hero-ctas">
+      <a class="btn btn-pdf" href="{{ROOT_PATH}}desenhos/">🖨️ Desenhos para Imprimir</a>
+      <a class="btn btn-online" href="{{ROOT_PATH}}colorir-online/">🖌️ Colorir Online</a>
+    </div>
+  </div>
+</section>
+
+<svg class="wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0,30 C240,60 480,0 720,30 C960,60 1200,0 1440,30 L1440,0 L0,0 Z" fill="#14b8a6" opacity="0.9"/></svg>
+
+<div class="wrap">
+  <section aria-labelledby="cats">
+    <div class="sec-head">
+      <h2 id="cats">🦕 Explorar por dinossauro</h2>
+      <p>Escolha seu dinossauro favorito e veja todos os desenhos dele</p>
+    </div>
+    <ul class="cat-circles">
+{{CIRCULOS}}
+    </ul>
+  </section>
+
+  <section aria-labelledby="pop">
+    <div class="sec-head">
+      <h2 id="pop">⭐ Desenhos populares para colorir</h2>
+      <p>Os favoritos das crianças — imprima o PDF ou pinte online</p>
+    </div>
+    <div class="grade-desenhos">
+{{GRADE}}
+    </div>
+    <p class="ver-todos"><a href="{{ROOT_PATH}}desenhos/">Ver todos os desenhos →</a></p>
+  </section>
+
+  <section class="como-funciona" aria-labelledby="como">
+    <div class="sec-head">
+      <h2 id="como">🎯 Como funciona? É facinho!</h2>
+      <p>Em 3 passinhos você já está colorindo 🦕</p>
+    </div>
+    <div class="passos">
+      <div class="passo"><span class="passo-num">1</span><span class="passo-ico">🔍</span><h3>Escolha o desenho</h3><p>Navegue pelas categorias ou busque seu dinossauro favorito.</p></div>
+      <div class="passo"><span class="passo-num">2</span><span class="passo-ico">🖨️</span><h3>Imprima ou pinte online</h3><p>Baixe o PDF grátis para imprimir, ou pinte direto no navegador.</p></div>
+      <div class="passo"><span class="passo-num">3</span><span class="passo-ico">🎨</span><h3>Solte a imaginação!</h3><p>Use lápis de cor, giz ou canetinha e divirta-se colorindo.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="nov">
+    <div class="sec-head">
+      <h2 id="nov">🆕 Novidades do site</h2>
+      <p>Desenhos novos toda semana — volte sempre!</p>
+    </div>
+    <div class="cards">
+{{POST_CARDS}}
+    </div>
+  </section>
+
+  <section aria-label="Colorir online">
+    <div class="cta-banner">
+      <span class="float-dino" style="top:15%;left:5%" aria-hidden="true">🎨</span>
+      <span class="float-dino" style="bottom:15%;right:6%;animation-delay:1.5s" aria-hidden="true">🖌️</span>
+      <h2>🖌️ Colorir Online: pinte no navegador, grátis</h2>
+      <p>Balde, pincel, lápis, spray e borracha inteligente — a tinta nunca sai da área do desenho. Escolha um dos nossos desenhos de dinossauros e solte a imaginação, sem baixar nada.</p>
+      <a class="btn btn-online" href="{{ROOT_PATH}}colorir-online/">Abrir o estúdio 🎨</a>
+    </div>
+  </section>
+
+  <section aria-labelledby="pedido-t">
+    <div class="pedido">
+      <h2 id="pedido-t">💌 Não achou seu dinossauro favorito?</h2>
+      <p>Conte pra gente qual dinossauro você quer colorir — criamos o desenho pra você! Novos dinossauros entram no ar toda semana. 🦖</p>
+      <a class="btn btn-pdf" href="{{ROOT_PATH}}contato/">Pedir um desenho 💌</a>
+    </div>
+  </section>
+
+  <section class="about-blurb">
+    <h2>Por que colorir dinossauros?</h2>
+    <p>Colorir dinossauros é uma atividade divertida e educativa para crianças de todas as idades.
+    Nossos <strong>desenhos de dinossauros para colorir</strong> são gratuitos, prontos para imprimir
+    e perfeitos para a sala de aula ou para um momento criativo em casa. Escolha seu dinossauro
+    favorito, imprima o PDF e solte a imaginação!</p>
+  </section>
+
+  <section class="faq" aria-labelledby="faqh">
+    <div class="sec-head">
+      <h2 id="faqh">❓ Perguntas frequentes</h2>
+    </div>
+    <div class="faq-list">
+{{FAQ_HOME}}
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var INDICE = {{SEARCH_INDEX}};
+  var campo = document.getElementById("campoBusca");
+  var caixa = document.getElementById("resultadosBusca");
+  function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+  function buscar(){
+    var q = norm(campo.value.trim());
+    caixa.innerHTML = "";
+    caixa.classList.remove("visivel");
+    if (q.length < 2){ return; }
+    var achados = [];
+    for (var i=0;i<INDICE.length && achados.length<8;i++){
+      var it = INDICE[i];
+      if (norm(it.t).indexOf(q)>=0 || norm(it.k).indexOf(q)>=0){ achados.push(it); }
+    }
+    if (!achados.length){
+      caixa.innerHTML = '<a href="javascript:void(0)">Nenhum desenho encontrado. Tente "t-rex" ou "triceratops".</a>';
+    } else {
+      var html = "";
+      for (var j=0;j<achados.length;j++){
+        html += '<a href="'+achados[j].u+'">'+achados[j].t+'<small>'+achados[j].k+'</small></a>';
+      }
+      caixa.innerHTML = html;
+    }
+    caixa.classList.add("visivel");
+  }
+  document.getElementById("formBusca").addEventListener("submit", buscar);
+  campo.addEventListener("input", buscar);
+  document.addEventListener("click", function(e){
+    if (!document.getElementById("formBusca").contains(e.target)){ caixa.classList.remove("visivel"); }
+  });
+})();
+</script>

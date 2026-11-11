@@ -1,0 +1,36 @@
+<nav class="breadcrumbs" aria-label="Você está aqui">
+  <a href="{{ROOT_PATH}}">Início</a> ›
+  <a href="{{ROOT_PATH}}desenhos/">Desenhos para Colorir</a> ›
+  <a href="{{ROOT_PATH}}categoria/{{CATEGORY_SLUG}}/">{{CATEGORY_NAME}}</a> ›
+  {{TITLE}}
+</nav>
+
+<article class="post">
+  <header class="post-header">
+    <h1>{{TITLE}}</h1>
+    <p class="post-meta">
+      Publicado em <time datetime="{{DATE_ISO}}">{{DATE_LONG}}</time>
+      · Categoria: <a href="{{ROOT_PATH}}categoria/{{CATEGORY_SLUG}}/">{{CATEGORY_NAME}}</a>
+    </p>
+  </header>
+
+  <div class="post-intro">
+{{INTRO}}
+  </div>
+
+{{SECTIONS}}
+
+  <section class="tips" aria-labelledby="dicas">
+    <h2 id="dicas">Dicas de Colorir</h2>
+    <ul>
+{{TIPS}}
+    </ul>
+  </section>
+
+  <section class="faq" aria-labelledby="faq-titulo">
+    <h2 id="faq-titulo">Perguntas Frequentes</h2>
+{{FAQS}}
+  </section>
+
+{{RELATED}}
+</article>

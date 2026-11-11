@@ -1,0 +1,817 @@
+<style>
+/* ===== Colorir Online — estúdio de pintura (visual lúdico) ===== */
+.tj-app{--roxo:#1e7a34;--roxo-esc:#145c26;--amarelo:#ffb300;--rosa:#e69c00;--fundo:#fffdf6;--borda:#e9e4d4;--texto:#2b2f2b;--cinza:#6b716b;}
+.tool-intro{font-size:1.08rem;line-height:1.65;color:#6b6584;margin:.5rem 0 1.4rem;max-width:64ch;}
+.tj-app{background:var(--fundo);border:2px solid var(--borda);border-radius:28px;padding:1.2rem;box-shadow:0 12px 34px rgba(30,122,52,.10);margin:0 0 1.8rem;color:var(--texto);}
+.tj-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.9rem;margin:0 0 1.2rem;padding:.4rem .2rem;list-style:none;}
+.tj-gallery li{margin:0;}
+.thumb{display:flex;flex-direction:column;width:100%;padding:.45rem;background:#fff;border:3px solid var(--borda);border-radius:18px;cursor:pointer;font:inherit;transition:transform .15s,border-color .15s,box-shadow .15s;}
+.thumb:hover{transform:translateY(-3px);border-color:var(--roxo);}
+.thumb[aria-pressed="true"]{border-color:var(--amarelo);box-shadow:0 0 0 4px rgba(255,207,63,.45);}
+.thumb img{width:100%;aspect-ratio:3/4;object-fit:cover;background:#fff;border-radius:12px;display:block;}
+.thumb span{font-size:.72rem;line-height:1.35;color:var(--cinza);margin-top:.35rem;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2em;}
+.tj-main{display:grid;grid-template-columns:92px minmax(0,1fr) 230px;gap:1rem;align-items:start;}
+/* ferramentas */
+.tj-tools{display:flex;flex-direction:column;gap:.55rem;background:#fff;border:2px solid var(--borda);border-radius:22px;padding:.7rem .55rem;position:sticky;top:1rem;}
+.tj-tool{display:flex;flex-direction:column;align-items:center;gap:.25rem;padding:.6rem .2rem;border:3px solid transparent;border-radius:16px;background:#f6f2ff;cursor:pointer;font-family:"Baloo 2",system-ui,sans-serif;font-weight:700;font-size:.72rem;color:var(--texto);transition:all .15s;min-height:64px;}
+.tj-tool svg{width:26px;height:26px;stroke:var(--roxo-esc);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tj-tool:hover{background:#efe7ff;transform:translateY(-2px);}
+.tj-tool[aria-pressed="true"]{background:#fff;border-color:var(--roxo);box-shadow:0 0 0 3px rgba(30,122,52,.25);}
+.tj-tool[aria-pressed="true"] svg{stroke:var(--roxo);}
+.tj-size{padding:.4rem .1rem 0;display:none;}
+.tj-size.visivel{display:block;}
+.tj-size label{font-size:.68rem;font-weight:700;color:var(--cinza);display:block;margin-bottom:.25rem;text-align:center;}
+.tj-size input{width:100%;accent-color:var(--roxo);}
+/* palco */
+.tj-stage{position:relative;background:#fff;border:2px solid var(--borda);border-radius:22px;overflow:hidden;box-shadow:0 8px 24px rgba(30,122,52,.10);min-height:320px;}
+#tela{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair;background:#fff;}
+.tj-chip{position:absolute;display:flex;gap:.35rem;align-items:center;background:rgba(255,255,255,.94);border:2px solid var(--borda);border-radius:999px;padding:.3rem .4rem;box-shadow:0 4px 12px rgba(0,0,0,.10);}
+.tj-zoom{left:.7rem;bottom:.7rem;}
+.tj-zoom button,.tj-hist button{width:38px;height:38px;border-radius:50%;border:2px solid var(--borda);background:#fff;font-family:"Baloo 2",system-ui,sans-serif;font-weight:700;font-size:1.05rem;color:var(--roxo-esc);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .14s;padding:0;}
+.tj-zoom button:hover:not(:disabled),.tj-hist button:hover:not(:disabled){background:var(--roxo);color:#fff;border-color:var(--roxo);}
+.tj-zoom button:disabled,.tj-hist button:disabled{opacity:.35;cursor:not-allowed;}
+.tj-zoom .pct{font-size:.8rem;font-weight:700;color:var(--cinza);min-width:44px;text-align:center;font-family:"Baloo 2",system-ui,sans-serif;}
+.tj-hist{right:.7rem;bottom:.7rem;}
+.tj-top{position:absolute;top:.7rem;right:.7rem;display:flex;gap:.4rem;}
+.tj-top button{display:flex;align-items:center;gap:.35rem;border:2px solid var(--borda);background:rgba(255,255,255,.94);border-radius:999px;padding:.45rem .8rem;font-family:"Baloo 2",system-ui,sans-serif;font-weight:700;font-size:.8rem;color:var(--roxo-esc);cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.08);transition:all .14s;}
+.tj-top button:hover{background:var(--roxo);color:#fff;border-color:var(--roxo);}
+.tj-top svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tj-toast{position:absolute;left:50%;bottom:4.4rem;transform:translateX(-50%) translateY(8px);background:#2e2a45;color:#fff;font-size:.85rem;font-weight:600;padding:.55rem 1.1rem;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap;z-index:5;}
+.tj-toast.visivel{opacity:1;transform:translateX(-50%) translateY(0);}
+/* cores */
+.tj-colors{background:#fff;border:2px solid var(--borda);border-radius:22px;padding:1rem .9rem;display:flex;flex-direction:column;gap:.7rem;position:sticky;top:1rem;max-height:78vh;overflow-y:auto;}
+.tj-current{display:flex;align-items:center;gap:.7rem;background:var(--fundo);border-radius:16px;padding:.6rem .7rem;}
+#corGrande{width:52px;height:52px;border-radius:50%;border:4px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);flex:0 0 auto;background:#f44336;}
+.tj-current strong{font-family:"Baloo 2",system-ui,sans-serif;font-size:1rem;display:block;}
+.tj-current small{color:var(--cinza);font-size:.72rem;}
+.tj-rotulo{font-family:"Baloo 2",system-ui,sans-serif;font-weight:700;font-size:.82rem;color:var(--roxo-esc);margin:.2rem 0 0;}
+.tj-fileira{display:flex;flex-wrap:wrap;gap:.45rem;}
+.tj-grade{display:grid;grid-template-columns:repeat(6,1fr);gap:.45rem;}
+.swatch{aspect-ratio:1;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.28);cursor:pointer;padding:0;transition:transform .13s;min-width:0;}
+.swatch:hover{transform:scale(1.15);}
+.swatch[aria-pressed="true"]{outline:3px solid var(--roxo-esc);outline-offset:2px;transform:scale(1.15);}
+.tj-custom{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:var(--fundo);border-radius:16px;padding:.55rem .7rem;font-size:.82rem;font-weight:700;color:var(--texto);cursor:pointer;}
+.tj-custom input{width:46px;height:46px;padding:0;border:3px solid #fff;border-radius:50%;background:none;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25);}
+/* barra de ações */
+.tj-bar{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1rem;}
+.tj-bar button{font-family:"Baloo 2",system-ui,sans-serif;font-weight:700;font-size:1rem;padding:.8rem 1.6rem;border-radius:999px;border:2.5px solid var(--roxo);background:#fff;color:var(--roxo-esc);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.5rem;min-height:54px;}
+.tj-bar button svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tj-bar button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(30,122,52,.25);}
+.tj-bar button.primario{background:var(--amarelo);border-color:#eab308;color:#3b2f00;box-shadow:0 6px 18px rgba(255,207,63,.45);}
+.tj-bar button.primario:hover{background:#ffd94d;}
+.tool-howto{background:#fff8e1;border:2px solid var(--amarelo);border-radius:22px;padding:1.2rem 1.4rem;margin:0 0 2rem;}
+.tool-howto h2{margin-top:0;font-size:1.35rem;color:#3b2f00;}
+.tool-howto ol{margin:.5rem 0 0;padding-left:1.3rem;}
+.tool-howto li{margin:.5rem 0;line-height:1.6;}
+@media (max-width:900px){
+  .tj-main{grid-template-columns:1fr;}
+  .tj-tools{flex-direction:row;overflow-x:auto;position:static;padding:.55rem;}
+  .tj-tool{min-width:74px;}
+  .tj-size{min-width:130px;display:none;align-self:center;}
+  .tj-size.visivel{display:block;}
+  .tj-colors{position:static;max-height:none;}
+  .tj-stage{min-height:280px;}
+  .tj-gallery{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:.6rem;}
+}
+</style>
+
+{{BREADCRUMB}}
+
+<h1>{{TITULO_FERRAMENTA}}</h1>
+<p class="tool-intro">Um estúdio de pintura grátis no navegador: balde de tinta, pincel, lápis, spray e borracha inteligente, zoom com dois dedos, desfazer/refazer e download em PNG. Escolha um desenho na galeria e solte a imaginação — funciona no celular, no tablet e no computador.</p>
+
+<div class="tj-app">
+  <ul class="tj-gallery" id="galeria" aria-label="Galeria de desenhos para colorir"></ul>
+
+  <div class="tj-main">
+    <div class="tj-tools" id="barraFerramentas" role="toolbar" aria-label="Ferramentas de pintura"></div>
+
+    <div class="tj-stage" id="palco">
+      <canvas id="tela"></canvas>
+      <div class="tj-chip tj-zoom" aria-label="Controles de zoom">
+        <button type="button" id="zoomMenos" aria-label="Diminuir zoom">−</button>
+        <span class="pct" id="zoomPct">100%</span>
+        <button type="button" id="zoomMais" aria-label="Aumentar zoom">+</button>
+      </div>
+      <div class="tj-top">
+        <button type="button" id="btnTelaCheia"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>Tela cheia</button>
+        <button type="button" id="btnPartilhar"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Partilhar</button>
+      </div>
+      <div class="tj-chip tj-hist" aria-label="Desfazer e refazer">
+        <button type="button" id="btnDesfazer" aria-label="Desfazer">↺</button>
+        <button type="button" id="btnRefazer" aria-label="Refazer">↻</button>
+        <button type="button" id="btnRecomecar" aria-label="Recomeçar"><svg viewBox="0 0 24 24" width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13h8l1-13"/></svg></button>
+      </div>
+      <div class="tj-toast" id="toast" role="status"></div>
+    </div>
+
+    <aside class="tj-colors" aria-label="Paleta de cores">
+      <div class="tj-current">
+        <span id="corGrande"></span>
+        <div><strong id="corHex">#F44336</strong><small>Cor atual — toque para trocar</small></div>
+      </div>
+      <div id="blocoDino" style="display:none">
+        <div class="tj-rotulo">Cores deste dinossauro</div>
+        <div class="tj-fileira" id="dinoCores"></div>
+      </div>
+      <div class="tj-rotulo">Tons da cor atual</div>
+      <div class="tj-fileira" id="tons"></div>
+      <div class="tj-rotulo">Todas as cores</div>
+      <div class="tj-grade" id="grade"></div>
+      <div class="tj-rotulo">Usadas recentemente</div>
+      <div class="tj-fileira" id="recentes"></div>
+      <label class="tj-custom">Sua cor <input type="color" id="corCustom" value="#7c3aed" aria-label="Escolher cor personalizada"></label>
+    </aside>
+  </div>
+
+  <div class="tj-bar">
+    <button type="button" id="btnBaixar" class="primario"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Baixar PNG</button>
+    <button type="button" id="btnImprimir"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7"/></svg>Imprimir</button>
+  </div>
+</div>
+
+<div class="tool-howto">
+  <h2>Como usar o estúdio</h2>
+  <ol>
+    <li>Escolha um desenho na galeria — ele abre na tela de pintura.</li>
+    <li>Use o <strong>balde</strong> para preencher áreas sem deixar pontinhos brancos na borda, o <strong>pincel</strong>, o <strong>lápis</strong> e o <strong>spray</strong> para pintar à mão livre — a tinta nunca sai da área onde você começou. A <strong>borracha</strong> apaga só a sua pintura (o desenho original nunca apaga) e o <strong>conta-gotas</strong> copia qualquer cor da arte.</li>
+    <li>Aperte <strong>+</strong> ou use dois dedos para dar zoom e pintar detalhes; arraste com a ferramenta <strong>mão</strong> para navegar.</li>
+    <li><strong>Desfazer</strong> e <strong>refazer</strong> corrigem qualquer passo. <strong>Baixar PNG</strong> salva sua arte e <strong>Imprimir</strong> manda direto para a impressora.</li>
+  </ol>
+</div>
+
+
+<script>
+(function(){
+"use strict";
+var ROOT = "{{ROOT_PATH}}";
+var TOL = 32;
+var MAX_DIM = 1100;
+var HIST_LIMIT = 20;
+
+var DESENHOS = {{DESENHOS_JSON}};
+
+var CORES = ["#f44336","#e91e63","#ff5da2","#ff9800","#ffcf3f","#ffeb3b","#cddc39","#4caf50","#009688","#00bcd4","#2196f3","#3f51b5","#7c3aed","#9c27b0","#795548","#a1887f","#d7ccc8","#9e9e9e","#616161","#212121","#ffffff","#ffcdd2","#f8bbd0","#ffe0b2","#fff9c4","#c8e6c9","#b2dfdb","#bbdefb","#d1c4e9","#e1bee7"];
+
+var FERRAMENTAS = [
+  {id:"balde",   rotulo:"Balde",      icone:'<svg viewBox="0 0 24 24"><path d="m5 11 7-7 7 7-7 7z"/><path d="m13 13 2.5 2.5a2.1 2.1 0 1 1-3 3L9 15"/><path d="M5 11l3-3"/></svg>'},
+  {id:"pincel",  rotulo:"Pincel",     icone:'<svg viewBox="0 0 24 24"><path d="m14 5 5 5L8 21l-5 1 1-5z"/><path d="m13 6 5 5"/></svg>'},
+  {id:"lapis",   rotulo:"Lápis",      icone:'<svg viewBox="0 0 24 24"><path d="m4 20 1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z"/><path d="m14.5 6.5 3 3"/></svg>'},
+  {id:"spray",   rotulo:"Spray",      icone:'<svg viewBox="0 0 24 24"><path d="M9 8h6v3H9zM10 11v9M6 20h8"/><circle cx="18" cy="6" r="1"/><circle cx="20" cy="10" r="1"/><circle cx="17" cy="12" r="1"/><circle cx="21" cy="14" r="1"/></svg>'},
+  {id:"borracha",rotulo:"Borracha",   icone:'<svg viewBox="0 0 24 24"><path d="m7 21-4-4 10-10 4 4z"/><path d="M11 21h9"/></svg>'},
+  {id:"gota",    rotulo:"Conta-gotas",icone:'<svg viewBox="0 0 24 24"><path d="m14 4 6 6-9 9H5v-6z"/><path d="m13 5 6 6"/></svg>'},
+  {id:"mao",     rotulo:"Mão",        icone:'<svg viewBox="0 0 24 24"><path d="M8 12V5.5a1.5 1.5 0 0 1 3 0V11m0-5.5v-1a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V12m0-2.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.8a6 6 0 0 1-4.7-2.3L4 14.5a1.6 1.6 0 0 1 2.5-2L8 14"/></svg>'}
+];
+
+/* Paletas inteligentes: cores padrão do dinossauro selecionado.
+   Quando um tipo novo entrar no site, adicione a entrada aqui. */
+var PALETAS_DINO = [
+  {chave:"t-rex",        cores:["#5a7d3c","#3d5a27","#6b8f3d","#8b5a2b","#a06a35","#d9c9a3","#f5f0e1","#2f2f2f"]},
+  {chave:"triceratops",  cores:["#7a8b6f","#5f7057","#a8b39a","#8b5a2b","#d9c9a3","#f5f0e1","#4a4a4a","#3d5a27"]},
+  {chave:"velociraptor", cores:["#8b5a2b","#6b4423","#a06a35","#d9c9a3","#4a4a4a","#c0392b","#f5f0e1","#2f2f2f"]},
+  {chave:"braquiossauro",cores:["#6b8f3d","#5a7d3c","#8b9a5b","#d9c9a3","#8b5a2b","#f5f0e1","#3d5a27","#4a4a4a"]},
+  {chave:"estegossauro", cores:["#7a8b6f","#5f7057","#c0392b","#8b5a2b","#d9c9a3","#f5f0e1","#4a4a4a","#2f2f2f"]},
+  {chave:"espinossauro", cores:["#5f7057","#7a8b6f","#8b5a2b","#c0392b","#d9c9a3","#4a90d9","#3d6b9a","#4a4a4a"]},
+  {chave:"pterossauro",  cores:["#c0392b","#e74c3c","#8b5a2b","#d9c9a3","#f5f0e1","#4a4a4a","#7a8b6f","#2f2f2f"]},
+  {chave:"pterodactilo", cores:["#8b9a5b","#6b7d43","#a8b39a","#d9c9a3","#8b5a2b","#c0392b","#f5f0e1","#4a4a4a"]},
+  {chave:"bebes",        cores:["#a8d8a8","#f9c6d3","#ffe0b2","#bbdefb","#fff9c4","#d1c4e9","#ffccbc","#c8e6c9"]}
+];
+function paletaPara(pasta){
+  for (var i=0;i<PALETAS_DINO.length;i++){
+    if (pasta.indexOf(PALETAS_DINO[i].chave)>=0){ return PALETAS_DINO[i].cores; }
+  }
+  return null;
+}
+
+/* ---------- elementos ---------- */
+function $(id){ return document.getElementById(id); }
+var tela = $("tela"), vctx = tela.getContext("2d");
+var palco = $("palco"), galeria = $("galeria"), barra = $("barraFerramentas");
+var corGrande = $("corGrande"), corHex = $("corHex"), corCustom = $("corCustom");
+var tonsBox = $("tons"), gradeBox = $("grade"), recentesBox = $("recentes");
+var toast = $("toast");
+
+/* ---------- estado ---------- */
+var ferramenta = "balde";
+var corAtual = {r:244, g:67, b:54, hex:"#f44336"};
+var tamanhoPincel = 18;
+var recentes = [];
+var linhaC = document.createElement("canvas");   /* arte original (nunca muda) */
+var tintaC = document.createElement("canvas");   /* pintura do usuário */
+var linhaX = linhaC.getContext("2d");
+var tintaX = tintaC.getContext("2d");
+var barreira = null;                              /* Uint8Array: 1 = traço */
+var cinzaArr = null;                            /* Uint8Array: tom de cinza da arte */
+var W = 0, H = 0;
+var zoom = 1, ox = 0, oy = 0;
+var histUndo = [], histRedo = [];
+var pronta = false;
+var desenhando = false, ultimoPt = null;
+var ponteiros = {}, pincaDist = 0, pincaZoom = 1;
+/* pintura com máscara de região (pincel/lápis/spray não saem da área) */
+var maskC = document.createElement("canvas");
+var tmpC = document.createElement("canvas");
+var maskX = maskC.getContext("2d"), tmpX = tmpC.getContext("2d");
+
+function hexParaRgb(h){
+  h = h.replace("#","");
+  return {r:parseInt(h.slice(0,2),16), g:parseInt(h.slice(2,4),16), b:parseInt(h.slice(4,6),16), hex:"#"+h};
+}
+function rgbParaHex(r,g,b){
+  function p(v){ v=Math.max(0,Math.min(255,Math.round(v))); var s=v.toString(16); return s.length<2?"0"+s:s; }
+  return "#"+p(r)+p(g)+p(b);
+}
+function mostrarToast(msg){
+  toast.textContent = msg;
+  toast.classList.add("visivel");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function(){ toast.classList.remove("visivel"); }, 2200);
+}
+
+/* ---------- histórico ---------- */
+function fotoTinta(){ return tintaC.toDataURL("image/png"); }
+function pushUndo(){
+  histUndo.push(fotoTinta());
+  if (histUndo.length > HIST_LIMIT){ histUndo.shift(); }
+  histRedo = [];
+  atualizarHist();
+}
+function restaurar(url){
+  var img = new Image();
+  img.onload = function(){
+    tintaX.save();
+    tintaX.setTransform(1,0,0,1,0,0);
+    tintaX.clearRect(0,0,W,H);
+    tintaX.drawImage(img,0,0);
+    tintaX.restore();
+    render();
+  };
+  img.src = url;
+}
+function atualizarHist(){
+  $("btnDesfazer").disabled = histUndo.length === 0;
+  $("btnRefazer").disabled = histRedo.length === 0;
+}
+
+/* ---------- render (zoom/pan) ---------- */
+function render(){
+  vctx.setTransform(1,0,0,1,0,0);
+  vctx.fillStyle = "#ffffff";
+  vctx.fillRect(0,0,tela.width,tela.height);
+  vctx.setTransform(zoom,0,0,zoom,ox,oy);
+  vctx.imageSmoothingEnabled = true;
+  vctx.drawImage(tintaC,0,0);
+  vctx.drawImage(linhaC,0,0);
+  vctx.setTransform(1,0,0,1,0,0);
+  $("zoomPct").textContent = Math.round(zoom*100)+"%";
+}
+function limitarPan(){
+  var vw = tela.width, vh = tela.height;
+  var cw = W*zoom, ch = H*zoom;
+  if (cw <= vw){ ox = (vw-cw)/2; } else { ox = Math.min(0, Math.max(vw-cw, ox)); }
+  if (ch <= vh){ oy = (vh-ch)/2; } else { oy = Math.min(0, Math.max(vh-ch, oy)); }
+}
+function aplicarZoom(novo, cx, cy){
+  novo = Math.max(1, Math.min(4, novo));
+  if (cx === undefined){ cx = tela.width/2; cy = tela.height/2; }
+  var ix = (cx-ox)/zoom, iy = (cy-oy)/zoom;
+  zoom = novo; ox = cx-ix*zoom; oy = cy-iy*zoom;
+  limitarPan(); render();
+}
+function paraImagem(e){
+  var r = tela.getBoundingClientRect();
+  var px = (e.clientX-r.left)*tela.width/r.width;
+  var py = (e.clientY-r.top)*tela.height/r.height;
+  return {x:(px-ox)/zoom, y:(py-oy)/zoom};
+}
+
+/* ---------- balde (respeita os traços, nunca os apaga) ---------- */
+function corProxima(d,i,tr,tg,tb,ta){
+  return Math.abs(d[i]-tr)<=TOL && Math.abs(d[i+1]-tg)<=TOL &&
+         Math.abs(d[i+2]-tb)<=TOL && Math.abs(d[i+3]-ta)<=TOL;
+}
+function balde(ix, iy){
+  var sx = Math.floor(ix), sy = Math.floor(iy);
+  if (sx<0||sy<0||sx>=W||sy>=H||!barreira){ return; }
+  if (barreira[sy*W+sx]){ mostrarToast("Toque dentro de uma área branca"); return; }
+  var img = tintaX.getImageData(0,0,W,H), d = img.data;
+  var si = (sy*W+sx)*4;
+  var tr=d[si], tg=d[si+1], tb=d[si+2], ta=d[si+3];
+  if (ta===255 && Math.abs(tr-corAtual.r)<=TOL && Math.abs(tg-corAtual.g)<=TOL && Math.abs(tb-corAtual.b)<=TOL){ return; }
+  pushUndo();
+  var visto = new Uint8Array(W*H);
+  var pilha = [sy*W+sx]; visto[sy*W+sx]=1;
+  var preenchidos = [];
+  while (pilha.length){
+    var k = pilha.pop();
+    preenchidos.push(k);
+    var x = k%W, y = (k/W)|0, o = k*4;
+    d[o]=corAtual.r; d[o+1]=corAtual.g; d[o+2]=corAtual.b; d[o+3]=255;
+    if (x>0){ var a=k-1; if(!visto[a]&&!barreira[a]){ var q=a*4; if(corProxima(d,q,tr,tg,tb,ta)){visto[a]=1;pilha.push(a);} } }
+    if (x<W-1){ var b=k+1; if(!visto[b]&&!barreira[b]){ var w2=b*4; if(corProxima(d,w2,tr,tg,tb,ta)){visto[b]=1;pilha.push(b);} } }
+    if (y>0){ var c=k-W; if(!visto[c]&&!barreira[c]){ var e2=c*4; if(corProxima(d,e2,tr,tg,tb,ta)){visto[c]=1;pilha.push(c);} } }
+    if (y<H-1){ var f=k+W; if(!visto[f]&&!barreira[f]){ var g2=f*4; if(corProxima(d,g2,tr,tg,tb,ta)){visto[f]=1;pilha.push(f);} } }
+  }
+  /* acabamento de borda: pinta os pixels claros da borda (anti-aliasing)
+     para não sobrarem pontinhos brancos */
+  var borda = preenchidos;
+  for (var pass=0; pass<3; pass++){
+    var mais = [];
+    for (var fi=0; fi<borda.length; fi++){
+      var kk = borda[fi], xx = kk%W, yy = (kk/W)|0;
+      var viz = [xx>0?kk-1:-1, xx<W-1?kk+1:-1, yy>0?kk-W:-1, yy<H-1?kk+W:-1];
+      for (var ni=0; ni<4; ni++){
+        var n = viz[ni];
+        if (n<0 || barreira[n]){ continue; }
+        var cz = cinzaArr[n];
+        if (cz < 100 || cz > 248){ continue; }
+        var o3 = n*4;
+        if (corProxima(d,o3,tr,tg,tb,ta)){
+          d[o3]=corAtual.r; d[o3+1]=corAtual.g; d[o3+2]=corAtual.b; d[o3+3]=255;
+          mais.push(n);
+        }
+      }
+    }
+    if (!mais.length){ break; }
+    borda = mais;
+  }
+  /* remove respingos: pixel claro cercado de tinta vira tinta */
+  function ehTinta(o){
+    return Math.abs(d[o]-corAtual.r)<=TOL && Math.abs(d[o+1]-corAtual.g)<=TOL &&
+           Math.abs(d[o+2]-corAtual.b)<=TOL && d[o+3]===255;
+  }
+  for (var it2=0; it2<2; it2++){
+    var mudou = false;
+    for (var yy2=1; yy2<H-1; yy2++){
+      for (var xx2=1; xx2<W-1; xx2++){
+        var k2 = yy2*W+xx2;
+        if (barreira[k2]){ continue; }
+        var o4 = k2*4;
+        if (ehTinta(o4)){ continue; }
+        var cnt = 0;
+        if (ehTinta(o4-4)){ cnt++; }
+        if (ehTinta(o4+4)){ cnt++; }
+        if (ehTinta(o4-W*4)){ cnt++; }
+        if (ehTinta(o4+W*4)){ cnt++; }
+        if (ehTinta(o4-W*4-4)){ cnt++; }
+        if (ehTinta(o4-W*4+4)){ cnt++; }
+        if (ehTinta(o4+W*4-4)){ cnt++; }
+        if (ehTinta(o4+W*4+4)){ cnt++; }
+        if (cnt>=6){
+          d[o4]=corAtual.r; d[o4+1]=corAtual.g; d[o4+2]=corAtual.b; d[o4+3]=255;
+          mudou = true;
+        }
+      }
+    }
+    if (!mudou){ break; }
+  }
+  tintaX.putImageData(img,0,0);
+  render();
+}
+
+/* ---------- pintura com máscara de região ----------
+   Pincel, lápis e spray só pintam dentro da região onde o traço
+   começou: a cor nunca atravessa os traços do desenho. */
+function calcularMascara(sx, sy){
+  var x = Math.floor(sx), y = Math.floor(sy);
+  if (x<0||y<0||x>=W||y>=H){ return null; }
+  if (barreira[y*W+x]){
+    var achou = null;
+    for (var r=1; r<=12 && !achou; r++){
+      for (var dy=-r; dy<=r && !achou; dy++){
+        for (var dx=-r; dx<=r; dx++){
+          var nx=x+dx, ny=y+dy;
+          if (nx<0||ny<0||nx>=W||ny>=H){ continue; }
+          if (!barreira[ny*W+nx]){ achou={x:nx,y:ny}; break; }
+        }
+      }
+    }
+    if (!achou){ return null; }
+    x = achou.x; y = achou.y;
+  }
+  var visto = new Uint8Array(W*H);
+  var pilha = [y*W+x]; visto[y*W+x]=1;
+  while (pilha.length){
+    var k = pilha.pop(), kx = k%W, ky = (k/W)|0;
+    if (kx>0){ var a=k-1; if(!visto[a]&&!barreira[a]){visto[a]=1;pilha.push(a);} }
+    if (kx<W-1){ var b=k+1; if(!visto[b]&&!barreira[b]){visto[b]=1;pilha.push(b);} }
+    if (ky>0){ var c=k-W; if(!visto[c]&&!barreira[c]){visto[c]=1;pilha.push(c);} }
+    if (ky<H-1){ var d2=k+W; if(!visto[d2]&&!barreira[d2]){visto[d2]=1;pilha.push(d2);} }
+  }
+  return visto;
+}
+function iniciarMascara(px, py){
+  var m = calcularMascara(px, py);
+  if (!m){ mostrarToast("Comece o traço dentro de uma área do desenho"); return false; }
+  maskC.width = W; maskC.height = H;
+  tmpC.width = W; tmpC.height = H;
+  var img = maskX.createImageData(W,H), dd = img.data;
+  for (var i=0;i<W*H;i++){
+    if (m[i]){ var o=i*4; dd[o]=255; dd[o+1]=255; dd[o+2]=255; dd[o+3]=255; }
+  }
+  maskX.putImageData(img,0,0);
+  return true;
+}
+function sprayEm(t, x, y){
+  var R = tamanhoPincel*1.6+8;
+  var n = Math.round(R*1.4);
+  t.fillStyle = corAtual.hex;
+  for (var i=0;i<n;i++){
+    var ang = Math.random()*Math.PI*2;
+    var dist = Math.sqrt(Math.random())*R;
+    var dx = x+Math.cos(ang)*dist, dy = y+Math.sin(ang)*dist;
+    var r = 1+Math.random()*2.2;
+    t.globalAlpha = 0.55+Math.random()*0.35;
+    t.beginPath(); t.arc(dx,dy,r,0,Math.PI*2); t.fill();
+  }
+  t.globalAlpha = 1;
+}
+function pintarSegmento(x0,y0,x1,y1){
+  var t = tmpX;
+  t.clearRect(0,0,W,H);
+  t.lineCap = "round"; t.lineJoin = "round";
+  if (ferramenta === "spray"){
+    sprayEm(t,x1,y1);
+  } else {
+    t.strokeStyle = corAtual.hex;
+    t.lineWidth = ferramenta === "lapis" ? 5 : tamanhoPincel;
+    t.beginPath(); t.moveTo(x0,y0); t.lineTo(x1,y1); t.stroke();
+  }
+  t.globalCompositeOperation = "destination-in";
+  t.drawImage(maskC,0,0);
+  t.globalCompositeOperation = "source-over";
+  tintaX.drawImage(tmpC,0,0);
+  render();
+}
+
+/* ---------- pincel / borracha (legado: borracha não usa máscara) ---------- */
+function traco(x, y){
+  tintaX.lineCap = "round"; tintaX.lineJoin = "round";
+  if (ferramenta === "borracha"){
+    tintaX.save();
+    tintaX.globalCompositeOperation = "destination-out";
+    tintaX.strokeStyle = "rgba(0,0,0,1)";
+    tintaX.lineWidth = tamanhoPincel;
+    tintaX.beginPath();
+    if (ultimoPt){ tintaX.moveTo(ultimoPt.x, ultimoPt.y); } else { tintaX.moveTo(x,y); }
+    tintaX.lineTo(x,y); tintaX.stroke();
+    tintaX.restore();
+  } else {
+    tintaX.strokeStyle = corAtual.hex;
+    tintaX.lineWidth = tamanhoPincel;
+    tintaX.beginPath();
+    if (ultimoPt){ tintaX.moveTo(ultimoPt.x, ultimoPt.y); } else { tintaX.moveTo(x,y); }
+    tintaX.lineTo(x,y); tintaX.stroke();
+  }
+  ultimoPt = {x:x, y:y};
+  render();
+}
+
+/* ---------- conta-gotas ---------- */
+function gota(ix, iy){
+  var sx = Math.floor(ix), sy = Math.floor(iy);
+  if (sx<0||sy<0||sx>=W||sy>=H){ return; }
+  var pd = tintaX.getImageData(sx,sy,1,1).data;
+  var hex;
+  if (pd[3] > 24){ hex = rgbParaHex(pd[0],pd[1],pd[2]); }
+  else {
+    var ld = linhaX.getImageData(sx,sy,1,1).data;
+    if (ld[3] < 24){ mostrarToast("Área em branco"); return; }
+    if (ld[0] < 110){ mostrarToast("Isso é o traço do desenho"); return; }
+    hex = rgbParaHex(ld[0],ld[1],ld[2]);
+  }
+  definirCor(hex, null);
+  mostrarToast("Cor copiada: "+hex.toUpperCase());
+}
+
+
+/* ---------- carregar desenho ---------- */
+function carregarImagem(src){
+  pronta = false;
+  var img = new Image();
+  img.onload = function(){
+    var w = img.naturalWidth, h = img.naturalHeight;
+    var esc = Math.min(1, MAX_DIM/Math.max(w,h));
+    W = Math.round(w*esc); H = Math.round(h*esc);
+    linhaC.width = tintaC.width = tela.width = W;
+    linhaC.height = tintaC.height = tela.height = H;
+    linhaX.clearRect(0,0,W,H);
+    linhaX.drawImage(img,0,0,W,H);
+    /* barreira: pixel é traço se cinza < 110; fundo branco vira transparente
+       para a tinta do usuário aparecer sob os traços */
+    var ld = linhaX.getImageData(0,0,W,H);
+    var px = ld.data;
+    barreira = new Uint8Array(W*H);
+    cinzaArr = new Uint8Array(W*H);
+    for (var i=0;i<W*H;i++){
+      var o = i*4;
+      var cinza = (px[o]+px[o+1]+px[o+2])/3;
+      cinzaArr[i] = cinza;
+      if (cinza < 110){ barreira[i]=1; }
+      else if (cinza > 240){ px[o+3]=0; }
+    }
+    linhaX.putImageData(ld,0,0);
+    tintaX.clearRect(0,0,W,H);
+    histUndo = []; histRedo = []; atualizarHist();
+    zoom = 1; aplicarZoom(1);
+    pronta = true;
+    render();
+  };
+  img.src = src;
+}
+function selecionar(i){
+  var itens = galeria.querySelectorAll(".thumb");
+  for (var k=0;k<itens.length;k++){ itens[k].setAttribute("aria-pressed", k===i?"true":"false"); }
+  var d = DESENHOS[i];
+  carregarImagem(ROOT+"assets/"+d.pasta+"/"+d.img+".webp");
+  montarDinoCores(d.pasta);
+  var pal = paletaPara(d.pasta);
+  if (pal && pal.length){ definirCor(pal[0], null); }
+  mostrarToast(d.label.split(".")[0]);
+}
+
+/* ---------- paleta ---------- */
+function definirCor(hex, botao){
+  corAtual = hexParaRgb(hex);
+  corGrande.style.backgroundColor = corAtual.hex;
+  corHex.textContent = corAtual.hex.toUpperCase();
+  var sw = document.querySelectorAll("#grade .swatch, #tons .swatch, #recentes .swatch");
+  for (var i=0;i<sw.length;i++){ sw[i].setAttribute("aria-pressed","false"); }
+  if (botao){ botao.setAttribute("aria-pressed","true"); }
+  var idx = recentes.indexOf(corAtual.hex);
+  if (idx>=0){ recentes.splice(idx,1); }
+  recentes.unshift(corAtual.hex);
+  if (recentes.length>10){ recentes.pop(); }
+  montarRecentes(); montarTons();
+}
+function criarSwatch(hex, pai){
+  var b = document.createElement("button");
+  b.type = "button"; b.className = "swatch";
+  b.style.backgroundColor = hex; b.title = hex;
+  b.setAttribute("aria-label","Cor "+hex); b.setAttribute("aria-pressed","false");
+  b.addEventListener("click", function(){ definirCor(hex, b); });
+  pai.appendChild(b);
+  return b;
+}
+function montarGrade(){
+  gradeBox.innerHTML = "";
+  for (var i=0;i<CORES.length;i++){ criarSwatch(CORES[i], gradeBox); }
+}
+function montarRecentes(){
+  recentesBox.innerHTML = "";
+  if (!recentes.length){ recentesBox.innerHTML = '<small style="color:#8a86a3">As cores que você usar aparecem aqui.</small>'; return; }
+  for (var i=0;i<recentes.length;i++){ criarSwatch(recentes[i], recentesBox); }
+}
+function montarTons(){
+  tonsBox.innerHTML = "";
+  var c = corAtual;
+  var tons = [
+    [c.r*0.45, c.g*0.45, c.b*0.45],
+    [c.r*0.7,  c.g*0.7,  c.b*0.7],
+    [c.r, c.g, c.b],
+    [c.r+(255-c.r)*0.35, c.g+(255-c.g)*0.35, c.b+(255-c.b)*0.35],
+    [c.r+(255-c.r)*0.65, c.g+(255-c.g)*0.65, c.b+(255-c.b)*0.65]
+  ];
+  for (var i=0;i<tons.length;i++){
+    criarSwatch(rgbParaHex(tons[i][0],tons[i][1],tons[i][2]), tonsBox);
+  }
+}
+function montarDinoCores(pasta){
+  var pal = paletaPara(pasta);
+  var bloco = $("blocoDino"), box = $("dinoCores");
+  box.innerHTML = "";
+  if (!pal){ bloco.style.display = "none"; return; }
+  bloco.style.display = "";
+  for (var i=0;i<pal.length;i++){ criarSwatch(pal[i], box); }
+}
+
+/* ---------- ferramentas ---------- */
+function montarFerramentas(){
+  barra.innerHTML = "";
+  for (var i=0;i<FERRAMENTAS.length;i++){
+    (function(f){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "tj-tool";
+      b.innerHTML = f.icone + "<span>"+f.rotulo+"</span>";
+      b.setAttribute("aria-pressed", f.id===ferramenta?"true":"false");
+      b.setAttribute("aria-label", f.rotulo);
+      b.addEventListener("click", function(){ trocarFerramenta(f.id); });
+      b.dataset.ferramenta = f.id;
+      barra.appendChild(b);
+    })(FERRAMENTAS[i]);
+  }
+  var sz = document.createElement("div");
+  sz.className = "tj-size"; sz.id = "caixaTamanho";
+  sz.innerHTML = '<label for="tamPincel">Tamanho: <span id="tamVal">'+tamanhoPincel+'</span></label>'+
+    '<input type="range" id="tamPincel" min="4" max="60" value="'+tamanhoPincel+'" aria-label="Tamanho do pincel">';
+  barra.appendChild(sz);
+  $("tamPincel").addEventListener("input", function(){
+    tamanhoPincel = parseInt(this.value,10);
+    $("tamVal").textContent = tamanhoPincel;
+  });
+}
+function trocarFerramenta(id){
+  ferramenta = id;
+  var bs = barra.querySelectorAll(".tj-tool");
+  for (var i=0;i<bs.length;i++){ bs[i].setAttribute("aria-pressed", bs[i].dataset.ferramenta===id?"true":"false"); }
+  $("caixaTamanho").classList.toggle("visivel", id==="pincel"||id==="borracha"||id==="spray");
+  tela.style.cursor = id==="mao" ? "grab" : (id==="gota" ? "copy" : "crosshair");
+}
+
+/* ---------- ponteiro: desenhar / mover / pinça ---------- */
+tela.addEventListener("pointerdown", function(e){
+  if (!pronta){ return; }
+  tela.setPointerCapture(e.pointerId);
+  ponteiros[e.pointerId] = {x:e.clientX, y:e.clientY};
+  var n = Object.keys(ponteiros).length;
+  if (n === 2){
+    var pts = []; for (var k in ponteiros){ pts.push(ponteiros[k]); }
+    pincaDist = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+    pincaZoom = zoom; desenhando = false; ultimoPt = null;
+    return;
+  }
+  e.preventDefault();
+  var p = paraImagem(e);
+  if (ferramenta === "balde"){ balde(p.x, p.y); }
+  else if (ferramenta === "gota"){ gota(p.x, p.y); }
+  else if (ferramenta === "mao"){ desenhando = "pan"; ultimoPt = {x:e.clientX, y:e.clientY}; tela.style.cursor="grabbing"; }
+  else if (ferramenta === "borracha"){ desenhando = true; pushUndo(); ultimoPt = null; traco(p.x, p.y); }
+  else {
+    if (iniciarMascara(p.x, p.y)){
+      desenhando = "mascara"; pushUndo();
+      ultimoPt = {x:p.x, y:p.y};
+      pintarSegmento(p.x, p.y, p.x, p.y);
+    }
+  }
+});
+tela.addEventListener("pointermove", function(e){
+  if (!ponteiros[e.pointerId]){ return; }
+  ponteiros[e.pointerId] = {x:e.clientX, y:e.clientY};
+  var ks = Object.keys(ponteiros);
+  if (ks.length === 2){
+    var a = ponteiros[ks[0]], b = ponteiros[ks[1]];
+    var dist = Math.hypot(a.x-b.x, a.y-b.y);
+    if (pincaDist > 0){
+      var r = tela.getBoundingClientRect();
+      aplicarZoom(pincaZoom*dist/pincaDist, (a.x+b.x)/2-r.left, (a.y+b.y)/2-r.top);
+    }
+    return;
+  }
+  if (desenhando === "pan"){
+    var dx = e.clientX-ultimoPt.x, dy = e.clientY-ultimoPt.y;
+    var rr = tela.getBoundingClientRect();
+    ox += dx*tela.width/rr.width; oy += dy*tela.height/rr.height;
+    ultimoPt = {x:e.clientX, y:e.clientY};
+    limitarPan(); render();
+  } else if (desenhando === "mascara"){
+    var pm = paraImagem(e);
+    pintarSegmento(ultimoPt.x, ultimoPt.y, pm.x, pm.y);
+    ultimoPt = {x:pm.x, y:pm.y};
+  } else if (desenhando === true){
+    var p = paraImagem(e);
+    traco(p.x, p.y);
+  }
+});
+function fimPonteiro(e){
+  delete ponteiros[e.pointerId];
+  if (Object.keys(ponteiros).length < 2){ pincaDist = 0; }
+  if (Object.keys(ponteiros).length === 0){
+    desenhando = false; ultimoPt = null;
+    if (ferramenta === "mao"){ tela.style.cursor = "grab"; }
+  }
+}
+tela.addEventListener("pointerup", fimPonteiro);
+tela.addEventListener("pointercancel", fimPonteiro);
+tela.addEventListener("wheel", function(e){
+  if (!pronta){ return; }
+  e.preventDefault();
+  var r = tela.getBoundingClientRect();
+  aplicarZoom(zoom*(e.deltaY<0?1.12:0.89), e.clientX-r.left, e.clientY-r.top);
+}, {passive:false});
+
+/* ---------- zoom botões ---------- */
+$("zoomMais").addEventListener("click", function(){ aplicarZoom(zoom*1.25); });
+$("zoomMenos").addEventListener("click", function(){ aplicarZoom(zoom/1.25); });
+
+/* ---------- ações ---------- */
+$("btnDesfazer").addEventListener("click", function(){
+  if (!histUndo.length){ return; }
+  histRedo.push(fotoTinta());
+  restaurar(histUndo.pop()); atualizarHist();
+});
+$("btnRefazer").addEventListener("click", function(){
+  if (!histRedo.length){ return; }
+  histUndo.push(fotoTinta());
+  restaurar(histRedo.pop()); atualizarHist();
+});
+$("btnRecomecar").addEventListener("click", function(){
+  if (!pronta){ return; }
+  pushUndo();
+  tintaX.clearRect(0,0,W,H);
+  histUndo = []; histRedo = []; atualizarHist();
+  render(); mostrarToast("Desenho limpo");
+});
+function comporPNG(){
+  var c = document.createElement("canvas"); c.width = W; c.height = H;
+  var x = c.getContext("2d");
+  x.fillStyle = "#ffffff"; x.fillRect(0,0,W,H);
+  x.drawImage(tintaC,0,0); x.drawImage(linhaC,0,0);
+  return c;
+}
+$("btnBaixar").addEventListener("click", function(){
+  if (!pronta){ return; }
+  var a = document.createElement("a");
+  a.download = "dinossauro-colorido.png";
+  a.href = comporPNG().toDataURL("image/png");
+  document.body.appendChild(a); a.click(); a.remove();
+  mostrarToast("PNG baixado");
+});
+$("btnImprimir").addEventListener("click", function(){
+  if (!pronta){ return; }
+  var url = comporPNG().toDataURL("image/png");
+  var wj = window.open("", "_blank");
+  if (!wj){ mostrarToast("Permita pop-ups para imprimir"); return; }
+  wj.document.write('<html><head><title>Imprimir desenho</title></head><body style="margin:0;text-align:center">'+
+    '<img src="'+url+'" style="max-width:100%;height:auto" onload="window.print()">'+'</body></html>');
+  wj.document.close();
+});
+$("btnPartilhar").addEventListener("click", function(){
+  var dados = {title:document.title, text:"Pintei um dinossauro no Colorir Online", url:location.href};
+  if (navigator.share){ navigator.share(dados).catch(function(){}); }
+  else if (navigator.clipboard){
+    navigator.clipboard.writeText(location.href).then(function(){ mostrarToast("Link copiado"); });
+  } else { mostrarToast("Copie o link do navegador"); }
+});
+$("btnTelaCheia").addEventListener("click", function(){
+  if (document.fullscreenElement){ document.exitFullscreen(); }
+  else if (palco.requestFullscreen){ palco.requestFullscreen(); }
+});
+
+/* ---------- galeria ---------- */
+(function montarGaleria(){
+  for (var i=0;i<DESENHOS.length;i++){
+    (function(d, idx){
+      var li = document.createElement("li");
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "thumb"; b.setAttribute("aria-pressed","false");
+      var img = document.createElement("img");
+      img.loading = "lazy"; img.alt = d.alt;
+      img.src = ROOT+"assets/"+d.pasta+"/"+d.img+".webp";
+      var rot = document.createElement("span"); rot.textContent = d.label;
+      b.appendChild(img); b.appendChild(rot);
+      b.addEventListener("click", function(){ selecionar(idx); });
+      li.appendChild(b); galeria.appendChild(li);
+    })(DESENHOS[i], i);
+  }
+})();
+
+/* ---------- teclado ---------- */
+document.addEventListener("keydown", function(e){
+  if (e.target.tagName === "INPUT"){ return; }
+  var k = e.key.toLowerCase();
+  if ((e.ctrlKey||e.metaKey) && k==="z" && !e.shiftKey){ e.preventDefault(); $("btnDesfazer").click(); }
+  else if ((e.ctrlKey||e.metaKey) && (k==="y" || (k==="z"&&e.shiftKey))){ e.preventDefault(); $("btnRefazer").click(); }
+  else if (k==="b"){ trocarFerramenta("balde"); }
+  else if (k==="p"){ trocarFerramenta("pincel"); }
+  else if (k==="l"){ trocarFerramenta("lapis"); }
+  else if (k==="s"){ trocarFerramenta("spray"); }
+  else if (k==="e"){ trocarFerramenta("borracha"); }
+  else if (k==="i"){ trocarFerramenta("gota"); }
+  else if (k==="m"){ trocarFerramenta("mao"); }
+  else if (k==="[" ){ tamanhoPincel=Math.max(4,tamanhoPincel-4); var s=$("tamPincel"); if(s){s.value=tamanhoPincel;$("tamVal").textContent=tamanhoPincel;} }
+  else if (k==="]"){ tamanhoPincel=Math.min(60,tamanhoPincel+4); var s2=$("tamPincel"); if(s2){s2.value=tamanhoPincel;$("tamVal").textContent=tamanhoPincel;} }
+});
+
+/* ---------- init ---------- */
+montarFerramentas(); montarGrade(); montarRecentes();
+corCustom.addEventListener("input", function(){ definirCor(corCustom.value, null); });
+definirCor(CORES[0], null); montarTons();
+atualizarHist(); trocarFerramenta("balde");
+
+/* Deep-link: colorir-online/?img=<pasta>/<imagem> ou página própria do desenho */
+(function(){
+  var q = null;
+  try { q = new URLSearchParams(window.location.search).get("img"); } catch(err){}
+  var preset = "{{PRESET_IMG}}";
+  function achar(alvo){
+    for (var i=0;i<DESENHOS.length;i++){
+      if ((DESENHOS[i].pasta+"/"+DESENHOS[i].img)===alvo){ return i; }
+    }
+    return -1;
+  }
+  if (q){
+    q = q.replace(/[^a-zA-Z0-9\/_-]/g,"");
+    var achou = achar(q);
+    if (achou>=0){ selecionar(achou); }
+    else { carregarImagem(ROOT+"assets/"+q+".webp"); }
+    return;
+  }
+  if (preset){
+    var achou2 = achar(preset);
+    if (achou2>=0){ selecionar(achou2); return; }
+  }
+  selecionar(0);
+})();
+})();
+
+</script>
